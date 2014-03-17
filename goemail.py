@@ -7,6 +7,7 @@ import member
 import assoc
 import logging
 import re
+import email_throttle
 
 from webapp2_extras import i18n
 from webapp2_extras import jinja2
@@ -177,10 +178,11 @@ def send_newgig_email(the_member, the_gig, the_band, the_gig_url):
         the_time_string = u'{0}{1} ({2})'.format(the_time_string,the_gig.endtime, _('End Time'))
     message.body=_('new_gig_email').format(the_band.name, the_gig.title, the_date_string, the_time_string, contact_name, the_gig.details, the_gig_url)
     
-    try:
-        message.send()
-    except:
-        logging.error('failed to send email!')
+#     try:
+    email_throttle.send_email(the_band.key, message)
+#         message.send()
+#     except:
+#         logging.error('failed to send email!')
         
     return True
 
