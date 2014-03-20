@@ -1,0 +1,202 @@
+{% extends 'go2base.html' %}
+
+{% block title %}{% trans %}Poll Edit{% endtrans %}{% endblock title %}
+
+{% block content %}
+    <div class="row">
+        <div class="page-header col-md-8 col-md-offset-2">
+        {% if newpoll_is_active %}
+            <h2>{% trans %}New Poll for {% endtrans %}{{ the_band.name }}</h1>
+        {% else %}
+            <h2>{% trans %}Poll Edit{% endtrans %}</h1>
+        {% endif %}
+        </div>
+    </div>
+    <form class="form" id="infoform" role="form" method="post" action="poll_edit.html">
+        <input type="hidden" name="poll_band" value="{{the_band.key.urlsafe()}}">
+        <div class="row">
+            <div class="form-group col-md-8 col-md-offset-2">
+                <label for="polltitleinput" class="control-label">{% trans %}Poll Question{% endtrans %}</label>
+                <input type="text" class="form-control" id="polltitleinput" placeholder="({%trans%}required{%endtrans%})" value="{{poll.title}}" name="poll_title">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-2 col-sm-4 col-xs-4 col-md-offset-2">
+                <label for="pollenddateinput" class="control-label">{% trans %}End Date{% endtrans %}</label>
+                <input type="text" class="datepicker form-control" id="pollenddateinput" name="poll_enddate" placeholder="({% trans %}closing date{% endtrans %})" 
+                {% if poll != None  and poll.enddate != None %} value="{{ the_date_formatter(the_user, poll.enddate, 'datepicker')}}" {% endif %}
+                name="poll_enddate">
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-group col-md-8 col-md-offset-2">
+                <label for="polldetailsinput" class="control-label">{% trans %}The Details{% endtrans %}</label>
+                <textarea class="form-control" rows="10" id="polldetailsinput" placeholder="{% trans %}What do you want to know?{% endtrans %}" name="poll_details">{{poll.details}}</textarea>
+            </div>
+        </div>            
+        
+        {% if newpoll_is_active %}
+            <div class="row">
+                <div class="form-group col-md-8 col-md-offset-2">
+                    <label class="checkbox">  
+                        <input type="checkbox" id="newpoll_notifymembers" name="poll_notifymembers" checked
+                        >{% trans %}Email members about this new poll{% endtrans %}  
+                    </label>  
+                </div>
+            </div>
+        {% endif %}
+        
+        <div class="row">
+            <div class="form-group col-md-4 col-md-offset-2 col-sm-6 col-sm-offset-0 col-xs-6 col-xs-offset-0">
+                {% if poll!=None %}
+                    <a data-toggle="modal" href="#deleteModal" class="btn btn-default">{% trans %}Delete{% endtrans %}</a>
+                    <a data-toggle="modal" href="#archiveModal" class="btn btn-default">{% trans %}Archive{% endtrans %}</a>
+                {% endif %}   
+            </div>
+            <div class="form-group col-md-4 text-right">                
+                    {% if poll==None %}
+                        <a class="btn btn-default" href="agenda.html">{% trans %}Cancel{% endtrans %}</a>
+                    {% else %}
+                        <a class="btn btn-default" href="poll_info.html?pk={{ poll.key.urlsafe() }}">{% trans %}Cancel{% endtrans %}</a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">{% trans %}Save{% endtrans %}</button>
+            </div>
+        </div>
+        {% if poll==None %}
+            <input type="hidden" name="pk" value="0">
+        {% else %}
+            <input type="hidden" name="pk" value="{{poll.key.urlsafe()}}">
+        {% endif %}
+    </form>
+{% endblock content %}        
+
+{% block modal %}
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans %}Confirm Delete{% endtrans %}</h4>
+                </div>
+                <div class="modal-body">
+                    {% trans %}Do you really want to delete this poll?{% endtrans %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Don't Delete{% endtrans %}</button>
+                    {% if poll %}
+                        <a class="btn btn-primary" id="opener" href="poll_delete?&pk={{ poll.key.urlsafe() }}">{% trans %}Delete{% endtrans %}</a>
+                    {% endif %}
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+
+    <div class="modal fade" id="archiveModal" tabindex="-1" role="dialog" aria-labelledby="archiveModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">{% trans %}Confirm archive{% endtrans %}</h4>
+                </div>
+                <div class="modal-body">
+                    {% trans %}Do you really want to archive this poll?{% endtrans %}
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{% trans %}Don't Archive{% endtrans %}</button>
+                    {% if poll %}
+                        <a class="btn btn-primary" id="opener" href="poll_archive?&pk={{ poll.key.urlsafe() }}">{% trans %}Archive{% endtrans %}</a>
+                    {% endif %}
+                </div>
+            </div><!-- /.modal-content -->
+        </div><!-- /.modal-dialog -->
+    </div><!-- /.modal -->
+{% endblock modal %}
+{% block localscripts %}
+<script src="/datepicker/js/bootstrap-datepicker.js"></script>
+<script src="/datepicker/js/locales/bootstrap-datepicker.{{ the_user.preferences.locale }}.js"></script>
+<script src="/js/jquery.validate.js"></script>
+{% if the_user.preferences.locale == 'en' %}
+<script src='/js/moment.min.js'></script>
+{% else %}
+<script src='/js/moment-with-langs.min.js'></script>
+{% endif %}
+<script>
+$(document).ready(function () {
+    $('#pollenddateinput').datepicker({
+                language: '{{ the_user.preferences.locale }}'
+            });
+    $('#pollenddateinput')
+      .on('changeDate', function(ev){
+        $('#pollenddateinput').datepicker('hide')
+      });
+
+
+    $.validator.addMethod(
+        "gigoDate",
+        function(value, element) {
+            if (value=="") {
+                return true;
+            } else {
+                // put your own logic here, this is just a (crappy) example
+                return value.match(/^\d\d?\/\d\d?\/\d\d\d\d$/);
+            }
+        },
+        "{% trans %}Please enter a date in the format mm/dd/yyyy.{% endtrans %}"
+    );
+      
+    $("#infoform").validate({
+        rules: {
+            poll_title: {
+                required: true
+            },
+            poll_enddate: {
+                gigoDate: true,
+                inFuture: true
+            },
+        },
+        messages: {
+            poll_title: {
+                required: "{% trans %}This field is required!{% endtrans %}"                
+            }
+        }
+    });
+
+});
+
+jQuery.validator.addMethod("greaterThan", 
+function(value, element, params) {
+
+    if (value=="") {
+        return true;
+    }
+
+    {% if the_user.preferences.locale != 'en' %} 
+        moment.lang('{{the_user.preferences.locale}}');
+    {% endif %}
+    d1 = moment(value,moment.langData('{{ the_user.preferences.locale }}').longDateFormat("L"));
+    d2 = moment($(params).val(),moment.langData('{{ the_user.preferences.locale }}').longDateFormat("L"));
+
+    return d1 > d2;
+},'{% trans %}Must be later than start date!{% endtrans %}');
+
+jQuery.validator.addMethod("inFuture", 
+function(value, element, params) {
+    if value {
+        today = moment();
+        today.hour(0);
+        today.minute(0);
+        today.second(0);
+        today.millisecond(0);
+        {% if the_user.preferences.locale != 'en' %} 
+            moment.lang('{{the_user.preferences.locale}}');
+        {% endif %}
+        d1 = moment(value,moment.langData('{{ the_user.preferences.locale }}').longDateFormat("L"));
+        return d1 >= today;
+    } else {
+        return true;
+    }
+},'{% trans %}Must be in the future!{% endtrans %}');
+
+</script>
+{% endblock localscripts %}
+

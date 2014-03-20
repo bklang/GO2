@@ -1,0 +1,111 @@
+{% extends 'go2base.html' %}
+
+{% block title %}{% trans %}Poll Info{% endtrans %}{% endblock title %}
+
+{% if band_has_sections %}
+    {% set plan_size_lg=10 %}
+    {% set plan_size_sm=8 %}
+{% else %}
+    {% set plan_size_lg=12 %}
+    {% set plan_size_sm=12 %}
+{% endif %}
+
+{% block content %}
+    {% set the_band_key = poll.key.parent() %}
+    <div class="row">
+        <div class="page-header col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12 col-sm-offset-0">
+            <h2>{% trans %}Poll Info{% endtrans %}</h1>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 col-sm-12 col-sm-offset-0">
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{% trans %}Info{% endtrans %}</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-md-2 col-sm-2 col-xs-3">{% trans %}Poll{% endtrans %}</div>
+                        <div class="col-md-10 col-sm-10 col-xs-9"><strong>{{ poll.title|e }}</strong></div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-2 col-sm-2 col-xs-3">{% trans %}Band{% endtrans %}</div>
+                        <div class="col-md-10 col-sm-10 col-xs-9"><a href="band_info.html?bk={{the_band_key.urlsafe()}}">{{ the_band_key.get().name }}</a></div>
+                    </div>
+                    {% if enddate_str %}
+                        <div class="row">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-3"><i class="fa fa-calendar"></i></div>
+                            <div class="col-md-10 col-sm-10 col-xs-9">{{ enddate_str }}</div>
+                        </div>
+                    {% endif %}
+                    {% if poll.details %}
+                        <div class="row">&nbsp;</div>
+                        <div class="row">
+                            <div class="col-md-2 col-sm-2 col-xs-3">{% trans %}The Question{% endtrans %}</div>
+                            <div class="col-md-10 col-sm-10 col-xs-9">{{ poll.details }}</div>
+                        </div>
+                    {% endif %}
+                    <div class="row">&nbsp;</div>
+                    {% if user_can_edit %}
+                        <div class="row">
+                            <br>
+                            <div class="col-md-12">
+                                <a class="btn btn-primary btn-sm" href="poll_edit.html?pk={{ poll.key.urlsafe() }}">{% trans %}Edit{% endtrans %}</a>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>  <!-- panel body -->
+            </div> <!-- panel -->
+            <div class="row">&nbsp;</div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{% trans %}Responses{% endtrans %}</strong>
+                </div>
+                <div class="panel-body">
+                    {% import 'gig_plan_edit.html' as plan_edit with context %}                
+                    <div class="row">
+                        <div class="col-lg-{{plan_size_lg}} col-md-{{plan_size_lg}} col-sm-{{plan_size_sm}} col-xs-{{plan_size_sm}}">
+                            {% for member_plan in the_plans %}
+                                {{ plan_edit.plan_edit(member_plan) }}
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div> <!-- panel body -->
+            </div> <!-- panel -->
+            <div class="row">&nbsp;</div>
+            <div class="panel panel-default">
+                <div class="panel-heading">
+                    <strong>{% trans %}Comments{% endtrans %}</strong>
+                </div>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12" id="gig_comment">
+                            {% if comment_text %}
+                                {{ comment_text | html_content | safe }}
+                            {% else %}
+                                {% trans %}No Comments (yet...){% endtrans %}
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="row">&nbsp;</div>
+                    <div class="row">
+                        <div class="col-lg-10 col-md-10">
+                            <textarea class="form-control" id="commentinput" placeholder="{% trans %}say your piece!{% endtrans %}" name="comment_input" rows="2"></textarea>
+                        </div>
+                        <div class="col-lg-2 col-md-2">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="add_comment('{{poll.key.urlsafe()}}');">{% trans %}Say it!{% endtrans %}</button>
+                        </div>
+                    </div>                    
+                </div> <!-- panel body -->
+            </div> <!-- panel -->
+        </div>
+    </div> <!-- row -->
+{% endblock content %}
+
+{% block localscripts %}
+<script src="/js/plan_buttons.js"></script>
+<script src="/js/comments.js"></script>
+<script src="/js/jquery.truncator.js"></script>
+{% endblock localscripts %}
+
