@@ -7,6 +7,7 @@ import grid
 import calview
 import member
 import gig
+import poll
 import plan
 import band
 import help
@@ -93,6 +94,13 @@ else:
         webapp2.Route('/gig_get_comment', gig.GetCommentHandler),
         webapp2.Route('/print_setlist', gig.PrintSetlist),
         webapp2.Route('/print_planlist', gig.PrintPlanlist),
+        webapp2.Route('/poll_info.html', poll.InfoPage, name="poll_info"),
+        webapp2.Route('/poll_edit.html', poll.EditPage),
+        webapp2.Route('/poll_archive', poll.ArchiveHandler),
+        webapp2.Route('/poll_autoarchive', poll.AutoArchiveHandler),
+        webapp2.Route('/poll_delete', poll.DeleteHandler),
+        webapp2.Route('/poll_add_comment', poll.CommentHandler),
+        webapp2.Route('/poll_get_comment', poll.GetCommentHandler),
         webapp2.Route('/band_info.html',band.InfoPage),
         webapp2.Route('/band_edit.html',band.EditPage),
         webapp2.Route('/band_delete.html',band.DeleteBand),
