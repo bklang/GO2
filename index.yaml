@@ -139,6 +139,12 @@ indexes:
   - name: verified
   - name: lower_name
 
+- kind: Poll
+  ancestor: yes
+  properties:
+  - name: is_archived
+  - name: created_date
+
 - kind: UserToken
   properties:
   - name: subject

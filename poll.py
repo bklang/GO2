@@ -33,19 +33,20 @@ class Poll(ndb.Model):
     title = ndb.StringProperty()
     details = ndb.TextProperty()
     created_date = ndb.DateProperty( auto_now_add=True )
-    enddate = ndb.DateProperty( default=None )
+    date = ndb.DateProperty( default=None )
     archive_id = ndb.TextProperty( default=None )
     is_anonymous = ndb.BooleanProperty(default=False )    
     is_archived = ndb.ComputedProperty(lambda self: self.archive_id is not None)    
     comment_id = ndb.TextProperty( default = None)
     creator = ndb.KeyProperty()
+
 #
 # Functions to make and find gigs
 #
 
-def new_poll(the_band, title, creator, enddate=None, details=""):
+def new_poll(the_band, title, creator, date=None, details=""):
     """ Make and return a new poll """
-    the_poll = Poll(parent=the_band.key, title=title, details=details, enddate=enddate, creator=creator)
+    the_poll = Poll(parent=the_band.key, title=title, details=details, date=date, creator=creator)
     the_poll.put()
     return the_poll
                 
@@ -289,11 +290,11 @@ class EditPage(BaseHandler):
         if poll_details is not None:
             the_poll.details = poll_details
 
-        poll_enddate = self.request.get("poll_enddate", None)
-        if poll_enddate is not None and poll_enddate != '':
-            the_poll.enddate = babel.dates.parse_date(poll_enddate,locale=self.user.preferences.locale)
+        poll_date = self.request.get("poll_date", None)
+        if poll_date is not None and poll_date != '':
+            the_poll.date = babel.dates.parse_date(poll_date,locale=self.user.preferences.locale)
         else:
-            the_poll.enddate = None
+            the_poll.date = None
 
         poll_anonymous=self.request.get("poll_anonymous",None)
         if (poll_anonymous):

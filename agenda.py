@@ -7,6 +7,7 @@ import member
 import gig
 import plan
 import band
+import poll
 import assoc
 import logging
 
@@ -44,12 +45,19 @@ class MainPage(BaseHandler):
 #         the_gigs = gig.get_gigs_for_bands(the_bands, num=num_to_put_in_upcoming, start_date=today_date)
         all_gigs = gig.get_gigs_for_band_keys(the_band_keys, show_canceled=show_canceled, start_date=today_date)
 
+        all_polls = poll.get_polls_for_band_keys(the_band_keys)
+
+        print '\n\n{0} polls\n\n'.format(len(all_polls))
+
         upcoming_plans = []
         weighin_plans = []        
+        poll_plans = []
 
-        if all_gigs:
-            for i in range(0, len(all_gigs)):
-                a_gig = all_gigs[i]
+        all_everything = all_gigs + all_polls
+
+        if all_everything:
+            for i in range(0, len(all_everything)):
+                a_gig = all_everything[i]
                 the_plan = plan.get_plan_for_member_for_gig(the_user, a_gig)
 
                 info_block={}
@@ -67,22 +75,28 @@ class MainPage(BaseHandler):
                     continue
                 info_block['the_band'] = a_band_key.get()
                 info_block['the_assoc'] = assoc.get_assoc_for_band_key_and_member_key(the_user.key, a_band_key)
-                if the_plan.section is None:
-                    info_block['the_section'] = info_block['the_assoc'].default_section
+
+                if type(all_everything[i]) == poll.Poll:
+                    info_block['infourl'] = 'poll_info.html?pk='
+                    poll_plans.append( info_block )
                 else:
-                    info_block['the_section'] = the_plan.section
-                if num_to_put_in_upcoming and i<num_to_put_in_upcoming and (the_plan.value or a_gig.status == 2): #include gigs for which we've weighed in or have been cancelled
-                    upcoming_plans.append( info_block )
-                else:            
-                    if (the_plan.value == 0 ):
-                        weighin_plans.append( info_block )
+                    info_block['infourl'] = 'gig_info.html?gk='
+                    if the_plan.section is None:
+                        info_block['the_section'] = info_block['the_assoc'].default_section
+                    else:
+                        info_block['the_section'] = the_plan.section
+                    if num_to_put_in_upcoming and i<num_to_put_in_upcoming and (the_plan.value or a_gig.status == 2): #include gigs for which we've weighed in or have been cancelled
+                        upcoming_plans.append( info_block )
+                    else:            
+                        if (the_plan.value == 0 ):
+                            weighin_plans.append( info_block )
 
         number_of_bands = len(the_band_keys)
-
 
         template_args = {
             'upcoming_plans' : upcoming_plans,
             'weighin_plans' : weighin_plans,
+            'poll_plans' : poll_plans,
             'show_band' : number_of_bands>1,
             'long_agenda' : the_user.show_long_agenda,
             'the_date_formatter' : member.format_date_for_member,

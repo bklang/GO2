@@ -28,10 +28,17 @@
                 {% if the_user_addgigbandlist %}
                     {% if the_user_addgigbandlist | length == 1 %}
                         <li {{ 'class="active"' if newgig_is_active }}><a href="/gig_edit.html?new=1&bk={{ the_user_addgigbandlist[0].key.urlsafe() }}">{% trans %}Add Gig{% endtrans %}</a></li>
+                        <li {{ 'class="active"' if newgig_is_active }}><a href="/poll_edit.html?new=1&bk={{ the_user_addgigbandlist[0].key.urlsafe() }}">{% trans %}Add Poll{% endtrans %}</a></li>
                     {% else %}
                         <li class="dropdown">
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Add Gig{% endtrans %}<b class="caret"></b></a>
                             <ul class="dropdown-menu" role="menu" id="addgigbandlinks">
+                              <li><a href="#">{% trans %}No bands yet!{% endtrans %}</a></li>
+                            </ul>
+                        </li>
+                        <li class="dropdown">
+                            <a href="#" class="dropdown-toggle" data-toggle="dropdown">{% trans %}Add Poll{% endtrans %}<b class="caret"></b></a>
+                            <ul class="dropdown-menu" role="menu" id="addpollbandlinks">
                               <li><a href="#">{% trans %}No bands yet!{% endtrans %}</a></li>
                             </ul>
                         </li>

@@ -22,10 +22,10 @@
         </div>
         <div class="row">
             <div class="form-group col-md-2 col-sm-4 col-xs-4 col-md-offset-2">
-                <label for="pollenddateinput" class="control-label">{% trans %}End Date{% endtrans %}</label>
-                <input type="text" class="datepicker form-control" id="pollenddateinput" name="poll_enddate" placeholder="({% trans %}closing date{% endtrans %})" 
-                {% if poll != None  and poll.enddate != None %} value="{{ the_date_formatter(the_user, poll.enddate, 'datepicker')}}" {% endif %}
-                name="poll_enddate">
+                <label for="polldateinput" class="control-label">{% trans %}End Date{% endtrans %}</label>
+                <input type="text" class="datepicker form-control" id="polldateinput" name="poll_date" placeholder="({% trans %}closing date{% endtrans %})" 
+                {% if poll != None  and poll.date != None %} value="{{ the_date_formatter(the_user, poll.date, 'datepicker')}}" {% endif %}
+                name="poll_date">
             </div>
         </div>
         <div class="row">
@@ -122,12 +122,12 @@
 {% endif %}
 <script>
 $(document).ready(function () {
-    $('#pollenddateinput').datepicker({
+    $('#polldateinput').datepicker({
                 language: '{{ the_user.preferences.locale }}'
             });
-    $('#pollenddateinput')
+    $('#polldateinput')
       .on('changeDate', function(ev){
-        $('#pollenddateinput').datepicker('hide')
+        $('#polldateinput').datepicker('hide')
       });
 
 
@@ -149,7 +149,7 @@ $(document).ready(function () {
             poll_title: {
                 required: true
             },
-            poll_enddate: {
+            poll_date: {
                 gigoDate: true,
                 inFuture: true
             },

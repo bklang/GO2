@@ -32,11 +32,11 @@
                         <div class="col-md-2 col-sm-2 col-xs-3">{% trans %}Band{% endtrans %}</div>
                         <div class="col-md-10 col-sm-10 col-xs-9"><a href="band_info.html?bk={{the_band_key.urlsafe()}}">{{ the_band_key.get().name }}</a></div>
                     </div>
-                    {% if enddate_str %}
+                    {% if date_str %}
                         <div class="row">&nbsp;</div>
                         <div class="row">
                             <div class="col-md-2 col-sm-2 col-xs-3"><i class="fa fa-calendar"></i></div>
-                            <div class="col-md-10 col-sm-10 col-xs-9">{{ enddate_str }}</div>
+                            <div class="col-md-10 col-sm-10 col-xs-9">{{ date_str }}</div>
                         </div>
                     {% endif %}
                     {% if poll.details %}
