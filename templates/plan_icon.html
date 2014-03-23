@@ -1,41 +1,73 @@
-{% macro icon(plan_value=-1) -%}
-    {% if plan_value == 1 %}
-        <i class="fa fa-circle fa-lg" style="color:green"></i>
-    {% elif plan_value == 2 %}
-        <i class="fa fa-circle-o fa-lg" style="color:green"></i>
-    {% elif plan_value == 3 %}
-        <i class="fa fa-question fa-lg" style="color:gray"></i>
-    {% elif plan_value == 4 %}
-        <i class="fa fa-square-o fa-lg" style="color:red"></i>
-    {% elif plan_value == 5 %}
-        <i class="fa fa-square fa-lg" style="color:red"></i>                
-    {% elif plan_value == 6 %}
-        <i class="fa fa-times fa-lg" style="color:black"></i>                
-    {% else %}
-        <i class="fa fa-minus fa-sm" style="color:black"></i>
+{% macro gig_button(plan) -%}
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','1')">{{ gig_icon(1) }} {% trans %}Definitely{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','2')">{{ gig_icon(2) }} {% trans %}Probably{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','3')">{{ gig_icon(3) }} {% trans %}Don't Know{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','4')">{{ gig_icon(4) }} {% trans %}Probably Not{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','5')">{{ gig_icon(5) }} {% trans %}Can't Do It{% endtrans %}</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','6')">{{ gig_icon(6) }} {% trans %}Not Interested{% endtrans %}</a></li>
+{%- endmacro %}
+
+{% macro gig_icon(plan_value=-1) -%}
+    {% if plan_value == 1 %}   <i class="fa fa-circle fa-lg" style="color:green"></i>
+    {% elif plan_value == 2 %} <i class="fa fa-circle-o fa-lg" style="color:green"></i>
+    {% elif plan_value == 3 %} <i class="fa fa-question fa-lg" style="color:gray"></i>
+    {% elif plan_value == 4 %} <i class="fa fa-square-o fa-lg" style="color:red"></i>
+    {% elif plan_value == 5 %} <i class="fa fa-square fa-lg" style="color:red"></i>                
+    {% elif plan_value == 6 %} <i class="fa fa-times fa-lg" style="color:black"></i>                
+    {% else %}                 <i class="fa fa-minus fa-sm" style="color:black"></i>
     {% endif %}
 {%- endmacro %}
 
-{% macro icon_display(plan) -%}
-    <button class="btn btn-link btn-sm icon-display">{{ icon(plan) }}</button>
+
+
+{% macro poll_button(plan) -%}
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','1')">{{ poll_icon(1) }} {% trans %}Strongly Agree{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','2')">{{ poll_icon(2) }} {% trans %}Agree{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','3')">{{ poll_icon(3) }} {% trans %}Neutral{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','4')">{{ poll_icon(4) }} {% trans %}Disagree{% endtrans %}</a></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','5')">{{ poll_icon(5) }} {% trans %}Strongly Disagree{% endtrans %}</a></li>
+        <li role="presentation" class="divider"></li>
+        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','6')">{{ poll_icon(6) }} {% trans %}Block!{% endtrans %}</a></li>
 {%- endmacro %}
 
-{% macro icon_button(plan) -%}
+{% macro poll_icon(plan_value=-1) -%}
+    {% if plan_value == 1 %}   <i class="fa fa-thumbs-up fa-lg" style="color:green"></i>
+    {% elif plan_value == 2 %} <i class="fa fa-thumbs-o-up fa-lg" style="color:green"></i>
+    {% elif plan_value == 3 %} <i class="fa fa-adjust fa-lg" style="color:gray"></i>
+    {% elif plan_value == 4 %} <i class="fa fa-thumbs-o-down fa-lg" style="color:red"></i>
+    {% elif plan_value == 5 %} <i class="fa fa-thumbs-down fa-lg" style="color:red"></i>                
+    {% elif plan_value == 6 %} <i class="fa fa-times fa-lg" style="color:black"></i>                
+    {% else %}                 <i class="fa fa-minus fa-sm" style="color:black"></i>
+    {% endif %}
+{%- endmacro %}
+
+
+
+
+{% macro icon_display(type, plan) -%}
+    {% if type == 'Gig' %}
+        <button class="btn btn-link btn-sm icon-display">{{ gig_icon(plan.value) }}</button>
+    {% elif type == 'Poll' %}
+        <button class="btn btn-link btn-sm icon-display">{{ poll_icon(plan.value) }}</button>
+    {% endif %}
+{%- endmacro %}
+
+{% macro icon_button(type, plan) -%}
 <div class="btn-group">
-    <button type="button" class="btn btn-default btn-sm dropdown-toggle text-center plan-button" data-toggle="dropdown" id="{{plan.key.urlsafe()}}" data-init="{{plan.value}}">
+    <button type="button" class="btn btn-default btn-sm dropdown-toggle text-center plan-button" data-toggle="dropdown" id="{{plan.key.urlsafe()}}" data-type="{{type}}" data-init="{{plan.value}}">
         <i class="fa fa-spinner fa-spin fa-lg"></i>
     </button>
     <ul class="dropdown-menu" role="menu">
-        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','1')">{{ icon(1) }} {% trans %}Definitely{% endtrans %}</a></li>
-        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','2')">{{ icon(2) }} {% trans %}Probably{% endtrans %}</a></li>
-        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','3')">{{ icon(3) }} {% trans %}Don't Know{% endtrans %}</a></li>
-        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','4')">{{ icon(4) }} {% trans %}Probably Not{% endtrans %}</a></li>
-        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','5')">{{ icon(5) }} {% trans %}Can't Do It{% endtrans %}</a></li>
-        <li role="presentation" class="divider"></li>
-        <li role="presentation"><a onclick="update_plan('{{plan.key.urlsafe()}}','6')">{{ icon(6) }} {% trans %}Not Interested{% endtrans %}</a></li>
+        {% if type == 'Gig' %}
+            {{ gig_button(plan) }}
+        {% elif type == 'Poll' %}
+            {{ poll_button(plan) }}
+        {% endif %}
     </ul>
 </div>
 {%- endmacro %}
+
 
 {% macro setup_plan_buttons(member_plans) -%}
 <script>

@@ -2,28 +2,56 @@ function set_plan_button(the_id, the_value) {
 
     var the_result='<i class="fa fa-minus fa-sm" style="color:black"></i>'
 
-    switch(the_value) {
-        case '1':
-            the_result='<i class="fa fa-circle fa-lg" style="color:green"></i>'
-            break;
-        case '2':
-            the_result='<i class="fa fa-circle-o fa-lg" style="color:green"></i>'
-            break;
-        case '3':
-            the_result='<i class="fa fa-question fa-lg" style="color:gray"></i>'
-            break;
-        case '4':
-            the_result='<i class="fa fa-square-o fa-lg" style="color:red"></i>'
-            break;
-        case '5':
-            the_result='<i class="fa fa-square fa-lg" style="color:red"></i>'
-            break;
-        case '6':
-            the_result='<i class="fa fa-times fa-lg" style="color:black"></i>'
-            break;
+
+    the_button = document.getElementById(the_id);
+    the_type = the_button.getAttribute("data-type");
+
+    if (the_type=='Gig') {
+        switch(the_value) {
+            case '1':
+                the_result='<i class="fa fa-circle fa-lg" style="color:green"></i>'
+                break;
+            case '2':
+                the_result='<i class="fa fa-circle-o fa-lg" style="color:green"></i>'
+                break;
+            case '3':
+                the_result='<i class="fa fa-question fa-lg" style="color:gray"></i>'
+                break;
+            case '4':
+                the_result='<i class="fa fa-square-o fa-lg" style="color:red"></i>'
+                break;
+            case '5':
+                the_result='<i class="fa fa-square fa-lg" style="color:red"></i>'
+                break;
+            case '6':
+                the_result='<i class="fa fa-times fa-lg" style="color:black"></i>'
+                break;
+        }
+    }
+    else if (the_type=='Poll') {
+        switch(the_value) {
+            case '1':
+                the_result='<i class="fa fa-thumbs-up fa-lg" style="color:green"></i>'
+                break;
+            case '2':
+                the_result='<i class="fa fa-thumbs-o-up fa-lg" style="color:green"></i>'
+                break;
+            case '3':
+                the_result='<i class="fa fa-adjust fa-lg" style="color:gray"></i>'
+                break;
+            case '4':
+                the_result='<i class="fa fa-thumbs-o-down fa-lg" style="color:red"></i>'
+                break;
+            case '5':
+                the_result='<i class="fa fa-thumbs-down fa-lg" style="color:red"></i>'
+                break;
+            case '6':
+                the_result='<i class="fa fa-times fa-lg" style="color:black"></i>'
+                break;
+        }
     }
     
-    document.getElementById(the_id).innerHTML=the_result;
+    the_button.innerHTML=the_result;
 }
 
 function init_plan_buttons() {
