@@ -167,7 +167,7 @@ class InfoPage(BaseHandler):
                 a_member_key = the_assoc.member
                 the_plan = plan.get_plan_for_member_key_for_gig_key(a_member_key, poll_key)
                 info_block={}
-                info_block['the_poll_key'] = the_poll.key
+                info_block['the_gig_key'] = the_poll.key
                 info_block['the_plan_key'] = the_plan.key
                 info_block['the_member_key'] = a_member_key
                 info_block['the_band_key'] = the_band_key
