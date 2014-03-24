@@ -52,6 +52,7 @@ class MainPage(BaseHandler):
         upcoming_plans = []
         weighin_plans = []        
         poll_plans = []
+        newpoll_plans = []
 
         all_everything = all_gigs + all_polls
 
@@ -78,7 +79,10 @@ class MainPage(BaseHandler):
 
                 if type(all_everything[i]) == poll.Poll:
                     info_block['infourl'] = 'poll_info.html?pk='
-                    poll_plans.append( info_block )
+                    if the_plan.value:
+                        poll_plans.append( info_block )
+                    else:
+                        newpoll_plans.append( info_block )
                 else:
                     info_block['infourl'] = 'gig_info.html?gk='
                     if the_plan.section is None:
@@ -97,6 +101,7 @@ class MainPage(BaseHandler):
             'upcoming_plans' : upcoming_plans,
             'weighin_plans' : weighin_plans,
             'poll_plans' : poll_plans,
+            'newpoll_plans' : newpoll_plans,
             'show_band' : number_of_bands>1,
             'long_agenda' : the_user.show_long_agenda,
             'the_date_formatter' : member.format_date_for_member,
