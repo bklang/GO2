@@ -1,6 +1,6 @@
 {% import 'plan_icon.html' as plan_icon %}
 
-{% macro plan_edit(plan_info) -%}
+{% macro plan_edit(plan_info, short) -%}
 
 {% set the_gig_key = plan_info['the_gig_key'] %}
 {% set the_gig = the_gig_key.get() %}
@@ -15,6 +15,23 @@
 {% else %}
     {% set show_section = False %}
 {% endif %}
+
+{#
+
+Responsiveness works like this:
+
+Date
+Group 1
+    Date
+    Title
+    Band (if needed)
+Group 2
+    Plan
+    Comment
+    
+If short view, we don't see group 2
+
+#}
 
 {% if show_band==True %}
     {% set date_lg = 2 %}
@@ -38,6 +55,11 @@
     {% set grp1_sm = 12 %}
     {% set grp2_lg = 8 %}
     {% set grp2_sm = 12 %}
+{% endif %}
+
+{% if short %}
+    {% set grp1_lg = 12 %}
+    {% set grp1_sm = 12 %}
 {% endif %}
 
 {% if show_section %}
@@ -82,6 +104,7 @@
             </div>
         </div>
         {% if the_gig.status != 2 %}
+        {% if short == false %}
         <div class="col-lg-{{grp2_lg}} col-md-{{grp2_lg}} col-sm-{{grp2_sm}} col-xs-{{grp2_sm}}">
             <div class="row">
                 <div class="col-lg-{{plan_lg}} col-md-{{plan_lg}} col-md-offset-0 col-sm-{{plan_sm}} col-sm-offset-{{plan_sm_offset}} col-xs-{{plan_sm}} col-xs-offset-{{plan_sm_offset}} ">
@@ -125,6 +148,7 @@
                 {% endif %}
             </div>
         </div>
+        {% endif %}
         {% else %}
         <div class="col-lg-{{grp2_lg}} col-md-{{grp2_lg}} col-sm-{{grp2_sm}} col-xs-{{grp2_sm}}">
             <strong>{% trans %}Cancelled!{% endtrans %}</strong>
