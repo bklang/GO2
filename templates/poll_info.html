@@ -2,14 +2,6 @@
 
 {% block title %}{% trans %}Poll Info{% endtrans %}{% endblock title %}
 
-{% if band_has_sections %}
-    {% set plan_size_lg=10 %}
-    {% set plan_size_sm=8 %}
-{% else %}
-    {% set plan_size_lg=12 %}
-    {% set plan_size_sm=12 %}
-{% endif %}
-
 {% block content %}
     {% set the_band_key = poll.key.parent() %}
     <div class="row">
@@ -42,7 +34,7 @@
                     {% if poll.details %}
                         <div class="row">&nbsp;</div>
                         <div class="row">
-                            <div class="col-md-2 col-sm-2 col-xs-3">{% trans %}The Question{% endtrans %}</div>
+                            <div class="col-md-2 col-sm-2 col-xs-3">{% trans %}The Details{% endtrans %}</div>
                             <div class="col-md-10 col-sm-10 col-xs-9">{{ poll.details }}</div>
                         </div>
                     {% endif %}
@@ -64,13 +56,9 @@
                 </div>
                 <div class="panel-body">
                     {% import 'gig_plan_edit.html' as plan_edit with context %}                
-                    <div class="row">
-                        <div class="col-lg-{{plan_size_lg}} col-md-{{plan_size_lg}} col-sm-{{plan_size_sm}} col-xs-{{plan_size_sm}}">
-                            {% for member_plan in the_plans %}
-                                {{ plan_edit.plan_edit(member_plan) }}
-                            {% endfor %}
-                        </div>
-                    </div>
+                    {% for member_plan in the_plans %}
+                        {{ plan_edit.plan_edit(member_plan) }}
+                    {% endfor %}
                 </div> <!-- panel body -->
             </div> <!-- panel -->
             <div class="row">&nbsp;</div>
