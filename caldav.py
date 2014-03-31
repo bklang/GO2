@@ -61,57 +61,25 @@ def make_event(the_gig, the_band):
     starthour = -1
     endhour = -1
     
-    if the_gig.calltime:
-        ct = None
-        try:
-            ct = datetime.datetime.strptime(the_gig.calltime,"%I:%M%p")
-        except:
-            try:
-                ct = datetime.datetime.strptime(the_gig.calltime,"%H:%M")
-            except:
-                pass # TODO convert to real time objects; for now punt
+    if the_gig.calltime_dt:
+        starthour = the_gig.calltime_dt.hour
+        startmin = the_gig.calltime_dt.minute
 
-        if ct:
-            starthour = ct.hour
-            startmin = ct.minute
-
-    elif the_gig.settime: # only use the set time if there's no call time
-        st = None
-        try:
-            st = datetime.datetime.strptime(the_gig.settime,"%I:%M%p")
-        except:
-            try:
-                st = datetime.datetime.strptime(the_gig.settime,"%H:%M")
-            except: 
-                pass # TODO convert to real time objects; for now punt
-
-        if st:
-            starthour = st.hour
-            startmin = st.minute
+    elif the_gig.settime_dt: # only use the set time if there's no call time
+        starthour = the_gig.settime_dt.hour
+        startmin = the_gig.settime_dt.minute
 
     et = None
-    if the_gig.endtime:
-        try:
-            et = datetime.datetime.strptime(the_gig.endtime,"%I:%M%p")
-        except:
-            try:
-                et = datetime.datetime.strptime(the_gig.endtime,"%H:%M")
-            except:
-                pass
-
-    if et:
-        endhour = et.hour
-        endmin = et.minute
+    if the_gig.endtime_dt:
+        endhour = the_gig.endtime_dt.hour
+        endmin = the_gig.endtime_dt.minute
     elif starthour >= 0:
             endhour = starthour + 1
             endmin = startmin
 
-
     if starthour >= 0:
-        starthour = starthour - the_band.time_zone_correction
         dtstart = '{0}T{1:02d}{2:02d}00Z'.format(dtstart,starthour,startmin)
     if endhour >= 0:
-        endhour = endhour - the_band.time_zone_correction
         dtend = '{0}T{1:02d}{2:02d}00Z'.format(dtend,endhour,endmin)
 
     the_url = 'http://gig-o-matic.appspot.com/gig_info.html?gk={0}'.format(the_gig.key.urlsafe())
