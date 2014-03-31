@@ -13,6 +13,7 @@ import logging
 
 import gig
 import datetime
+from pytz.gae import pytz
 
 def make_cal_header(the_band):
     header="""BEGIN:VCALENDAR
@@ -51,19 +52,33 @@ def make_event(the_gig, the_band):
 
     summary = the_gig.title
 
-    dtstart = the_gig.date.strftime("%Y%m%d")
+    if the_band.timezone:
+        tzoffset = datetime.datetime.now(pytz.timezone(the_band.timezone)).dst()
+        
+    print '\n\n tzoffset={0}\n\n'.format(tzoffset)
 
+    start_date = the_gig.date
     if the_gig.enddate:
-        dtend = the_gig.enddate.strftime("%Y%m%d")
+        end_date = the_gig.enddate
     else:
-        dtend = the_gig.date.strftime("%Y%m%d")
-    
+        end_date = start_date
+        
+    if tzoffset:
+        start_date = start_date - tzoffset
+        end_date = end_date - tzoffset
+
+    dtstart = start_date.strftime("%Y%m%d")
+    dtend = end_date.strftime("%Y%m%d")    
+
     starthour = -1
     endhour = -1
     
     if the_gig.calltime_dt:
-        starthour = the_gig.calltime_dt.hour
-        startmin = the_gig.calltime_dt.minute
+        call_time = the_gig.calltime_dt
+        if tzoffset:
+            call_time = call_time - tzoffset
+        starthour = call_time.hour
+        startmin = call_time.minute
 
     elif the_gig.settime_dt: # only use the set time if there's no call time
         starthour = the_gig.settime_dt.hour

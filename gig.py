@@ -542,7 +542,8 @@ class EditPage(BaseHandler):
 
         gig_call = self.request.get("gig_call", None)
         if gig_call is not None and gig_call != '':
-            the_gig.calltime_dt = parse_time(gig_call, the_band.timezone)
+             dt_obj = parse_time(gig_call, the_band.timezone)
+             the_gig.calltime_dt = dt_obj
 
         gig_set = self.request.get("gig_set", None)
         if gig_set is not None and gig_set != '':
