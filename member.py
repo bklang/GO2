@@ -25,6 +25,7 @@ import lang
 
 import logging
 from babel.dates import format_date, format_datetime, format_time
+from pytz.gae import pytz
 
 import json
 from debug import debug_print
@@ -272,10 +273,22 @@ def format_date_for_member(the_user, the_date, format="short"):
         the_str=u'{0}'.format(format_date(the_date,locale=the_locale,format="EEE"))
     elif format=='datepicker':
         # here we want the short format but replace the year with the complete year
-        tmpstr=format_date(the_date,locale=the_locale,format="short")[:-2]
-        the_str=tmpstr+str(the_date.year)
+        if the_date:
+            tmpstr=format_date(the_date,locale=the_locale,format="short")[:-2]
+            the_str=tmpstr+str(the_date.year)
     return the_str
                             
+def format_time_for_member(the_user, the_band, the_time):
+    print '\n\nformatting time {0}'.format(the_time)
+    the_locale='en'
+    if the_user.preferences and the_user.preferences.locale:
+        the_locale=the_user.preferences.locale
+    if the_band and the_band.timezone:
+        the_time = the_time.astimezone(pytz.timezone(the_band.timezone))
+    the_str=u'{0}'.format(format_time(the_time,locale=the_locale,format="short"))
+    print 'the str:{0}'.format(the_str)
+    return the_str
+
 #####
 #
 # Page Handlers

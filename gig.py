@@ -248,6 +248,9 @@ def make_archive_for_gig_key(the_gig_key):
         plan.delete_plans_for_gig_key(the_gig_key)
 
 def parse_time(the_time_string, timezone):
+
+    print '\n\nin parse_time {0} {1}'.format(the_time_string, timezone)
+
     et = None
     try:
         et = datetime.datetime.strptime(the_time_string,"%I:%M%p")
@@ -257,10 +260,17 @@ def parse_time(the_time_string, timezone):
         except:
             pass
 
-    if et and timezone:
-        et.replace(tzinfo=timezone)
+    if et:
+        print 'et is {0}'.format(et)
+        if timezone:
+            print 'tz is {0}'.format(pytz.timezone(timezone))
+            et = et.replace(tzinfo=pytz.timezone(timezone))
+        else:
+            et = et.replace(tzinfo=pytz.utc)
 
-    return et
+    et = et.astimezone(pytz.utc)
+    print 'utc et is {0}'.format(et)
+    return et.replace(tzinfo=None)
 #
 #
 # Handlers
@@ -349,6 +359,23 @@ class InfoPage(BaseHandler):
             else:
                 enddatestr = ''
 
+            if the_gig.calltime_dt:
+                callstr = member.format_time_for_member(the_user, the_band, the_gig.calltime_dt.replace(tzinfo=pytz.utc))
+            else:
+                callstr = None
+
+            if the_gig.settime_dt:
+                setstr = member.format_time_for_member(the_user, the_band, the_gig.settime_dt.replace(tzinfo=pytz.utc))
+            else:
+                setstr = None
+
+            if the_gig.endtime_dt:
+                endstr = member.format_time_for_member(the_user, the_band, the_gig.endtime_dt.replace(tzinfo=pytz.utc))
+            else:
+                endstr = None
+
+            print '\n\n{0} {1} {2}\n\n'.format(callstr, setstr, endstr)
+
             template_args = {
                 'gig' : the_gig,
                 'date_str' : datestr,
@@ -356,6 +383,9 @@ class InfoPage(BaseHandler):
                 'the_plans' : the_plans,
                 'the_sections' : the_sections,
                 'comment_text' : the_comment_text,
+                'callstr' : callstr,
+                'setstr' : setstr,
+                'endstr' : endstr,
                 'band_has_sections' : band_has_sections,
                 'user_is_band_admin' : user_is_band_admin,
                 'user_can_edit' : user_can_edit
@@ -417,15 +447,15 @@ class EditPage(BaseHandler):
 
         # convert date into local times
         if the_gig.calltime_dt:
-            calltime_string = member.format_time_for_member(the_user, the_band, the_gig.calltime_dt)
+            calltime_string = member.format_time_for_member(the_user, the_band, the_gig.calltime_dt.replace(tzinfo=pytz.utc))
         else:
             calltime_string = ''
         if the_gig.settime_dt:
-            settime_string = member.format_time_for_member(the_user, the_band, the_gig.settime_dt)
+            settime_string = member.format_time_for_member(the_user, the_band, the_gig.settime_dt.replace(tzinfo=pytz.utc))
         else:
             settime_string = ''
         if the_gig.endtime_dt:
-            endtime_string = member.format_time_for_member(the_user, the_band, the_gig.endtime_dt)
+            endtime_string = member.format_time_for_member(the_user, the_band, the_gig.endtime_dt.replace(tzinfo=pytz.utc))
         else:
             endtime_string = ''
             
@@ -490,34 +520,43 @@ class EditPage(BaseHandler):
         if gig_date is not None and gig_date != '':
 #             the_gig.date = babel.dates.parse_date(gig_date,locale=self.user.preferences.locale)
             tmp = babel.dates.parse_date(gig_date,locale=self.user.preferences.locale)
-            the_gig.date = datetime.datetime.combine(tmp,datetime.time(0,0,0,0))
-        # todo validate form entry so date isn't bogus
+            date_obj = datetime.datetime.combine(tmp,datetime.time(0,0,0,0))
+            if the_band.timezone:
+                date_obj = date_obj.replace(tzinfo=pytz.timezone(the_band.timezone))
+            else:
+                date_obj = date_obj.replace(tzinfo=pytz.utc)
+            the_gig.date = date_obj.astimezone(pytz.utc).replace(tzinfo=None)        # todo validate form entry so date isn't bogus
        
         gig_enddate = self.request.get("gig_enddate", None)
         if gig_enddate is not None and gig_enddate != '':
 #             the_gig.enddate = babel.dates.parse_date(gig_enddate,locale=self.user.preferences.locale)
             tmp = babel.dates.parse_date(gig_enddate,locale=self.user.preferences.locale)
-            the_gig.enddate = datetime.datetime.combine(tmp,datetime.time(0,0,0,0))
+            date_obj = datetime.datetime.combine(tmp,datetime.time(0,0,0,0))
+            if the_band.timezone:
+                date_obj = date_obj.replace(tzinfo=pytz.timezone(the_band.timezone))
+            else:
+                date_obj = date_obj.replace(tzinfo=pytz.utc)
+            the_gig.enddate = date_obj.astimezone(pytz.utc).replace(tzinfo=None)
         else:
             the_gig.enddate = None
 
-        gig_call = self.request.get("gig_call", '')
-        if gig_call is not None:
+        gig_call = self.request.get("gig_call", None)
+        if gig_call is not None and gig_call != '':
             the_gig.calltime_dt = parse_time(gig_call, the_band.timezone)
 
-        gig_set = self.request.get("gig_set", '')
-        if gig_set is not None:
+        gig_set = self.request.get("gig_set", None)
+        if gig_set is not None and gig_set != '':
             the_gig.settime_dt = parse_time(gig_set, the_band.timezone)
 
-        gig_end = self.request.get("gig_end", '')
-        if gig_end is not None:
+        gig_end = self.request.get("gig_end", None)
+        if gig_end is not None and gig_end != '':
             the_gig.endtime_dt = parse_time(gig_end, the_band.timezone)
 
-        gig_address = self.request.get("gig_address", '')
+        gig_address = self.request.get("gig_address", None)
         if gig_address is not None:
             the_gig.address = gig_address
 
-        gig_dress = self.request.get("gig_dress", '')
+        gig_dress = self.request.get("gig_dress", None)
         if gig_dress is not None:
             the_gig.dress = gig_dress
 
