@@ -72,18 +72,27 @@
                 name="gig_enddate">
             </div>
         </div>
+        {% if the_user_is_superuser %}
+            <div class="row">
+                <div class="col-md-12">
+                    old call time : {{ gig.calltime }}<br>
+                    old set time : {{ gig.settime }}<br>
+                    old end time : {{ gig.endtime }}<br>
+                </div>
+            </div>        
+        {% endif %}
         <div class="row">
             <div class="form-group col-md-2 col-md-offset-2 col-sm-4 col-xs-4">
                 <label for="gigcallinput" class="control-label">{% trans %}Call Time{% endtrans %}</label>
-                <input type="text" class="form-control" id="gigcallinput" placeholder="4:20" value="{{gig.calltime}}" name="gig_call">
+                <input type="text" class="form-control" id="gigcallinput" placeholder="4:20" value="{{calltime_string}}" name="gig_call">
             </div>
             <div class="form-group col-md-2 col-sm-4 col-xs-4">
                 <label for="gigsetinput" class="control-label">{% trans %}Set Time{% endtrans %}</label>
-                <input type="text" class="form-control" id="gigsetinput" placeholder="" value="{{gig.settime}}" name="gig_set">
+                <input type="text" class="form-control" id="gigsetinput" placeholder="" value="{{settime_string}}" name="gig_set">
             </div>
             <div class="form-group col-md-2 col-sm-4 col-xs-4">
                 <label for="gigendinput" class="control-label">{% trans %}End Time{% endtrans %}</label>
-                <input type="text" class="form-control" id="gigendinput" placeholder="" value="{{gig.endtime}}" name="gig_end">
+                <input type="text" class="form-control" id="gigendinput" placeholder="" value="{{endtime_string}}" name="gig_end">
             </div>
         </div>
         <div class="row">

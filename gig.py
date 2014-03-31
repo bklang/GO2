@@ -23,6 +23,7 @@ import assoc
 # import jinja2env
 import jinja2ext
 import logging
+from pytz.gae import pytz
 
 import datetime
 import babel
@@ -37,11 +38,16 @@ class Gig(ndb.Model):
     details = ndb.TextProperty()
     setlist = ndb.TextProperty()
     created_date = ndb.DateProperty( auto_now_add=True )
-    date = ndb.DateProperty( default=True)
-    enddate = ndb.DateProperty( default=None )
+    date = ndb.DateTimeProperty( default=None)
+    enddate = ndb.DateTimeProperty( default=None )
     calltime = ndb.TextProperty( default=None )
     settime = ndb.TextProperty( default=None )
     endtime = ndb.TextProperty( default=None )
+    
+    calltime_dt = ndb.DateTimeProperty( default=None )
+    settime_dt = ndb.DateTimeProperty( default=None )
+    endtime_dt = ndb.DateTimeProperty( default=None )
+    
     address = ndb.TextProperty( default=None )
     dress = ndb.TextProperty( default=None )
     paid = ndb.TextProperty( default=None )
@@ -73,9 +79,9 @@ def get_gig_from_key(key):
     return key.get()
         
 def adjust_date_for_band(the_band, the_date):
-    if the_band.time_zone_correction:
-        # this band is in a non-UTC time zone!
-        the_date=the_date+datetime.timedelta(hours=the_band.time_zone_correction)
+    return the_date ### ALERT THIS MUST BE FIXED
+    if the_band.timezone:
+        the_date=the_date.astimezone(pytz.timezone(the_band.timezone))
     the_date = the_date.replace(hour=0, minute=0, second=0, microsecond=0)
     return the_date
     
@@ -241,6 +247,20 @@ def make_archive_for_gig_key(the_gig_key):
         # also delete any plans, since they're all now in the archive
         plan.delete_plans_for_gig_key(the_gig_key)
 
+def parse_time(the_time_string, timezone):
+    et = None
+    try:
+        et = datetime.datetime.strptime(the_time_string,"%I:%M%p")
+    except:
+        try:
+            et = datetime.datetime.strptime(the_time_string,"%H:%M")
+        except:
+            pass
+
+    if et and timezone:
+        et.replace(tzinfo=timezone)
+
+    return et
 #
 #
 # Handlers
@@ -276,6 +296,7 @@ class InfoPage(BaseHandler):
             
         if not the_gig.is_archived:
             the_band_key = the_gig.key.parent()
+            the_band = the_band_key.get()
 
             the_assocs = assoc.get_assocs_of_band_key(the_band_key, confirmed_only=True, keys_only=False)
 
@@ -319,7 +340,7 @@ class InfoPage(BaseHandler):
             user_can_edit = False
             if user_is_band_admin or the_user.is_superuser:
                 user_can_edit = True
-            elif the_band_key.get().anyone_can_manage_gigs:
+            elif the_band.anyone_can_manage_gigs:
                 user_can_edit = True
 
             datestr = member.format_date_for_member(the_user, the_gig.date, format="long")
@@ -393,11 +414,28 @@ class EditPage(BaseHandler):
             user_is_band_admin = False
         else:
             user_is_band_admin = assoc.get_admin_status_for_member_for_band_key(the_user, the_gig.key.parent())
+
+        # convert date into local times
+        if the_gig.calltime_dt:
+            calltime_string = member.format_time_for_member(the_user, the_band, the_gig.calltime_dt)
+        else:
+            calltime_string = ''
+        if the_gig.settime_dt:
+            settime_string = member.format_time_for_member(the_user, the_band, the_gig.settime_dt)
+        else:
+            settime_string = ''
+        if the_gig.endtime_dt:
+            endtime_string = member.format_time_for_member(the_user, the_band, the_gig.endtime_dt)
+        else:
+            endtime_string = ''
             
         template_args = {
             'gig' : the_gig,
             'the_band' : the_band,
             'user_is_band_admin': user_is_band_admin,
+            'calltime_string' : calltime_string,
+            'settime_string' : settime_string,
+            'endtime_string' : endtime_string,
             'newgig_is_active' : is_new,
             'the_date_formatter' : member.format_date_for_member
         }
@@ -450,34 +488,30 @@ class EditPage(BaseHandler):
 
         gig_date = self.request.get("gig_date", None)
         if gig_date is not None and gig_date != '':
-#             the_gig.date = datetime.datetime.strptime(gig_date, \
-#                                                       '%m/%d/%Y').date()
-            the_gig.date = babel.dates.parse_date(gig_date,locale=self.user.preferences.locale)
+#             the_gig.date = babel.dates.parse_date(gig_date,locale=self.user.preferences.locale)
+            tmp = babel.dates.parse_date(gig_date,locale=self.user.preferences.locale)
+            the_gig.date = datetime.datetime.combine(tmp,datetime.time(0,0,0,0))
         # todo validate form entry so date isn't bogus
        
         gig_enddate = self.request.get("gig_enddate", None)
         if gig_enddate is not None and gig_enddate != '':
-#             the_gig.enddate = datetime.datetime.strptime(gig_enddate, \
-#                                                       '%m/%d/%Y').date()
-            the_gig.enddate = babel.dates.parse_date(gig_enddate,locale=self.user.preferences.locale)
+#             the_gig.enddate = babel.dates.parse_date(gig_enddate,locale=self.user.preferences.locale)
+            tmp = babel.dates.parse_date(gig_enddate,locale=self.user.preferences.locale)
+            the_gig.enddate = datetime.datetime.combine(tmp,datetime.time(0,0,0,0))
         else:
             the_gig.enddate = None
 
         gig_call = self.request.get("gig_call", '')
         if gig_call is not None:
-            the_gig.calltime = gig_call
+            the_gig.calltime_dt = parse_time(gig_call, the_band.timezone)
 
         gig_set = self.request.get("gig_set", '')
         if gig_set is not None:
-            the_gig.settime = gig_set
+            the_gig.settime_dt = parse_time(gig_set, the_band.timezone)
 
         gig_end = self.request.get("gig_end", '')
         if gig_end is not None:
-            the_gig.endtime = gig_end
-
-        gig_end = self.request.get("gig_end", '')
-        if gig_end is not None:
-            the_gig.endtime = gig_end
+            the_gig.endtime_dt = parse_time(gig_end, the_band.timezone)
 
         gig_address = self.request.get("gig_address", '')
         if gig_address is not None:
