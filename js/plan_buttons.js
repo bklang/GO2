@@ -22,6 +22,9 @@ function set_plan_button(the_id, the_value) {
         case '6':
             the_result='<i class="fa fa-times fa-lg" style="color:black"></i>'
             break;
+        case '7':
+            the_result='<i class="fa fa-ban fa-lg" style="color:black"></i>'
+            break;
     }
     
     document.getElementById(the_id).innerHTML=the_result;

@@ -82,7 +82,7 @@
                         {% if the_member_key == the_user.key or the_user_is_superuser %}
                             <div class="row">
                                 <div class="col-md-3 col-sm-3 col-xs-3">
-                                    {{ plan_icon.icon_button(the_plan, the_band.simple_planning ) }}
+                                    {{ plan_icon.icon_button(the_plan, the_band.simple_planning, the_assoc.is_occasional ) }}
                                 </div>
                                 {% if the_band.plan_feedback %}
                                     <div class="col-md-3 col-sm-3 col-xs-3">

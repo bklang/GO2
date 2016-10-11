@@ -79,10 +79,12 @@ class MainPage(BaseHandler):
                     info_block['the_section'] = info_block['the_assoc'].default_section
                 else:
                     info_block['the_section'] = the_plan.section
-                if num_to_put_in_upcoming and i<num_to_put_in_upcoming and (the_plan.value or a_gig.status == 2): #include gigs for which we've weighed in or have been cancelled
+                if num_to_put_in_upcoming and i<num_to_put_in_upcoming and (the_plan.value or a_gig.status == 2) and the_plan.value != 7: 
+                    #include gigs for which we've weighed in or have been cancelled, but
+                    # not if we've said to hide the gig
                     upcoming_plans.append( info_block )
                 else:            
-                    if (the_plan.value == 0 ):
+                    if (the_plan.value == 0):
                         weighin_plans.append( info_block )
 
         number_of_bands = len(the_band_keys)

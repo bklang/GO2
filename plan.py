@@ -17,7 +17,7 @@ import assoc
 import datetime
 import logging
 
-plan_text = ["No Plan", "Definitely", "Probably", "Don't Know", "Probably Not", "Can't Do It", "Not Interested"]
+plan_text = ["No Plan", "Definitely", "Probably", "Don't Know", "Probably Not", "Can't Do It", "Not Interested", "Hide"]
 
 #
 # class for plan
