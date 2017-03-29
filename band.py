@@ -135,24 +135,28 @@ def get_section_keys_of_band_key(the_band_key):
     return the_band_key.get().sections
 
 def get_assocs_of_band_key_by_section_key(the_band_key, include_occasional=True):
+
     the_band = the_band_key.get()
-    the_info=[]
-    the_map={}
-    count=0
-    for s in the_band.sections:
-        the_info.append([s,[]])
-        the_map[s]=count
-        count=count+1
-    the_info.append([None,[]]) # for 'None'
-    the_map[None]=count
 
     the_assocs = assoc.get_confirmed_assocs_of_band_key(the_band_key, include_occasional=include_occasional)
-    
-    for an_assoc in the_assocs:
-        the_info[the_map[an_assoc.default_section]][1].append(an_assoc)
 
-    if the_info[the_map[None]][1] == []:
-        the_info.pop(the_map[None])
+    the_info = []
+    the_assoc_index = 0
+    nones = []
+
+    while the_assocs[the_assoc_index].default_section is None:
+        nones.append(the_assocs[the_assoc_index])
+        the_assoc_index += 1
+
+    for s in the_band.sections:
+        the_section_assocs=[]
+        while (the_assoc_index < len(the_assocs)) and (the_assocs[the_assoc_index].default_section == s):
+            the_section_assocs.append(the_assocs[the_assoc_index])
+            the_assoc_index += 1
+        the_info.append([s, the_section_assocs])
+
+    if nones:
+        the_info.append([None,nones])
 
     return the_info
 
@@ -669,7 +673,7 @@ class SetupSections(BaseHandler):
             the_deleted_sections = json.loads(deleted_section_info)
             if the_deleted_sections:
                 assoc_keys = []
-                dels = [ndb.Key(urlsafe=x) for x in the_deleted_sections]
+                dels = [ndb.Key(urlsafe=x) for x in the_deleted_sections if x]
                 for d in dels:
                     assoc_keys += assoc.get_assocs_for_section_key(d, keys_only=True)
 

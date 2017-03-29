@@ -64,7 +64,7 @@ def get_confirmed_assocs_of_band_key(the_band_key, include_occasional=True):
     if not include_occasional:
         args.append( Assoc.is_occasional==False )
         
-    assoc_query = Assoc.lquery( *args ).order(Assoc.member_name)
+    assoc_query = Assoc.lquery( *args ).order(Assoc.default_section_index, Assoc.member_name)
 
 #     assoc_query = Assoc.lquery( Assoc.band==the_band_key, Assoc.is_confirmed==True, Assoc.is_invited==False ).order(Assoc.member_name)
     assocs = assoc_query.fetch()
@@ -210,9 +210,9 @@ def set_multi(the_member_key, the_band_key, the_do):
 def get_assocs_of_band_key(the_band_key, confirmed_only=False, keys_only=False):
     """ go get all the assocs for a band """
     if confirmed_only:
-        assoc_query = Assoc.lquery( Assoc.band==the_band_key, Assoc.is_confirmed==True, Assoc.is_invited==False ).order(Assoc.member_name)
+        assoc_query = Assoc.lquery( Assoc.band==the_band_key, Assoc.is_confirmed==True, Assoc.is_invited==False ).order(Assoc.default_section_index, Assoc.member_name)
     else:
-        assoc_query = Assoc.lquery( Assoc.band==the_band_key ).order(Assoc.member_name)
+        assoc_query = Assoc.lquery( Assoc.band==the_band_key ).order(Assoc.default_section_index, Assoc.member_name)
     assocs = assoc_query.fetch(keys_only=keys_only)
     return assocs
 
