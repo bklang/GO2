@@ -145,7 +145,7 @@ def get_assocs_of_band_key_by_section_key(the_band_key, include_occasional=True)
     nones = []
 
     # the 'no section' members show up first; put them at the end
-    while the_assocs[the_assoc_index].default_section is None:
+    while (the_assoc_index < len(the_assocs)) and (the_assocs[the_assoc_index].default_section is None):
         nones.append(the_assocs[the_assoc_index])
         the_assoc_index += 1
 
